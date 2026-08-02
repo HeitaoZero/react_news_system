@@ -1,0 +1,83 @@
+import React from 'react'
+import { useState } from 'react'
+import { Layout, Menu } from 'antd'
+import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import axios from 'axios'
+import {
+  UploadOutlined,
+  UserOutlined,
+  VideoCameraOutlined,
+} from '@ant-design/icons';
+import styles from './SideMenu.module.css'
+const { Sider } = Layout
+
+const menuItemIcon = {
+  "/home": <UserOutlined />,
+  "/user-manage": <VideoCameraOutlined />,
+  "/user-manage/list": <UploadOutlined />,
+  "/right-manage": <UploadOutlined />,
+  "/right-manage/role/list": <UploadOutlined />,
+  "/right-manage/right/list": <UploadOutlined />,
+  "/news-manage": <UploadOutlined />,
+  "/news-manage/add": <UploadOutlined />,
+  "/news-manage/draft": <UploadOutlined />,
+  "/news-manage/category": <UploadOutlined />,
+  "/audit-manage": <UploadOutlined />,
+  "/audit-manage/audit": <UploadOutlined />,
+  "/audit-manage/list": <UploadOutlined />,
+  "/publish-manage": <UploadOutlined />,
+  "/publish-manage/unpublished": <UploadOutlined />,
+  "/publish-manage/published": <UploadOutlined />,
+  "/publish-manage/sunset": <UploadOutlined />,
+
+}
+
+// 迭代菜单list，过滤掉没有权限的菜单项，并将其转换为antd Menu组件所需的格式
+const transformMenu = ((items) => {
+  return items
+    .filter(item => item.pagepermisson === 1)
+    .map(item => {
+      const result = {
+        key: item.key,
+        label: item.title,
+        icon: menuItemIcon[item.key]
+      }
+      if (item.children && item.children.length > 0) {
+        result.children = transformMenu(item.children)
+      }
+      return result
+    })
+})
+export default function SideMenu() {
+  const [collapsed] = useState(false);
+  const navigate = useNavigate();
+  const [menuList, setMenuList] = useState([])
+  const handlePushPath = (e) => {
+    const { key } = e;
+    navigate(key);
+
+  };
+
+
+  useEffect(() => {
+    axios.get('/api/rights?_embed=children').then((res) => {
+      setMenuList(transformMenu(res.data))
+    })
+  }, [])
+
+  return (
+    <Sider trigger={null} collapsible collapsed={collapsed}>
+      <div className={`demo-logo-vertical ${styles.logo}`} >
+        全球新闻管理系统
+      </div>
+      <Menu
+        theme="dark"
+        mode="inline"
+        defaultSelectedKeys={['/home']}
+        items={menuList}
+        onClick={(e) => { handlePushPath(e); }}
+      />
+    </Sider >
+  )
+}
