@@ -4,6 +4,7 @@ import { Layout, Menu } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import axios from 'axios'
+import { useLocation } from 'react-router-dom'
 import {
   UploadOutlined,
   UserOutlined,
@@ -52,11 +53,11 @@ const transformMenu = ((items) => {
 export default function SideMenu() {
   const [collapsed] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation()
   const [menuList, setMenuList] = useState([])
   const handlePushPath = (e) => {
     const { key } = e;
     navigate(key);
-
   };
 
 
@@ -71,13 +72,16 @@ export default function SideMenu() {
       <div className={`demo-logo-vertical ${styles.logo}`} >
         全球新闻管理系统
       </div>
-      <Menu
-        theme="dark"
-        mode="inline"
-        defaultSelectedKeys={['/home']}
-        items={menuList}
-        onClick={(e) => { handlePushPath(e); }}
-      />
+      <div className={styles.menuContainer}>
+        <Menu
+          theme="dark"
+          mode="inline"
+          selectedKeys={[location.pathname]}
+          defaultOpenKeys={['/' + location.pathname.split('/')[1]]}
+          items={menuList}
+          onClick={(e) => { handlePushPath(e); }}
+        />
+      </div>
     </Sider >
   )
 }

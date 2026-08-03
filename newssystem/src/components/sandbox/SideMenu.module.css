@@ -6,5 +6,31 @@
     color: white;
     background: rgba(255, 255, 255, 0.3);
     text-align: center;
-    
+
+}
+
+.menuContainer {
+    height: calc(100vh - 50px);
+    /* 减去logo高度 */
+    overflow-y: auto;
+    /* 内容超出时出现滚动条 */
+    overflow-x: hidden;
+    /* 禁止横向滚动 */
+}
+
+.menuContainer::-webkit-scrollbar {
+    width: 6px;
+}
+
+.menuContainer::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.menuContainer::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.menuContainer::-webkit-scrollbar-track {
+    background: transparent;
 }
