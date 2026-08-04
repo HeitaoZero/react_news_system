@@ -108,7 +108,6 @@ export default function RightList() {
                 dataSource={dataSource}
                 columns={columns}
                 pagination={{ pageSize: 5 }}
-                className={`${styles.rightList} ${styles.menuContainer}`}
             />
         </div>
     )
