@@ -10,6 +10,11 @@ export default function UserList() {
   const [isAddVisible, setIsAddVisible] = useState(false);
   const [isUpdateVisible, setIsUpdateVisible] = useState(false);
   const [chooseId, setChooseId] = useState(null);
+  const GetToken = () => {
+    return JSON.parse(localStorage.getItem('token'))
+  }
+  const { roleId, id, region } = GetToken()
+
   const columns = [
     {
       title: '区域',
@@ -38,6 +43,7 @@ export default function UserList() {
           <Switch
             checked={roleState}
             onChange={() => { changeRoleState(item, roleState) }}
+            disabled={item.default}
           ></Switch>
         )
       },
@@ -59,7 +65,7 @@ export default function UserList() {
             placement="topRight"
             onConfirm={() => { handleDeleteUser(item.id) }}
           >
-            <Button danger icon={<DeleteOutlined />} shape="circle" ></Button>
+            <Button danger icon={<DeleteOutlined />} shape="circle" disabled={item.default}></Button>
           </Popconfirm>
           <Button type="primary" icon={<EditOutlined />} shape="circle" onClick={() => {
             setIsUpdateVisible(true)
@@ -83,19 +89,38 @@ export default function UserList() {
   }
   useEffect(() => {
     const getUserList = async () => {
+      const userObj = {
+        "1": "superAdmin",
+        "2": "admin",
+        "3": "audit"
+      }
       try {
-        const res = await axios.get('/api/users?_expand=role')
-        const dataSource = res.data.map(item => {
+        const res = await axios.get('/api/users?_expand=role').then(res => {
+          if (userObj[roleId] === "superAdmin") {
+            return res.data
+          }
+          else if (userObj[roleId] === "admin") {
+            const datalist = [
+              res.data.find(item => item.id === id),
+              ...res.data.filter(item => item.roleId === 3 && item.region === region)
+            ]
+            return datalist
+          } else if (userObj[roleId] === "audit") {
+            return res.data.filter(item => item.id === id)
+          }
+        })
+        const dataSource = res.map(item => {
           if (item.region === "") item.region = '全球'
           return { ...item, roleName: item.role?.roleName || '暂无' }
         })
+
         setDataSource(dataSource)
       } catch (error) {
         console.log('获取用户列表失败', error)
       }
     };
     getUserList();
-  }, [])
+  }, [roleId, id, region])
 
   const handleDeleteUser = async (id) => {
     try {
@@ -108,10 +133,27 @@ export default function UserList() {
   };
   return (
     <div>
-      <Button type="primary" onClick={() => { setIsAddVisible(true) }}>添加用户</Button>
+      {roleId === 3 ? null : <Button type="primary" onClick={() => { setIsAddVisible(true) }}>添加用户</Button>}
       <Table dataSource={dataSource} columns={columns} rowKey="id" pagination={{ pageSize: 8 }} />;
       <UserForm title={'添加用户'} isVisible={isAddVisible} setIsVisible={setIsAddVisible} setDataSource={setDataSource} dataSource={dataSource} />
       <UserForm setChooseId={setChooseId} chooseId={chooseId} title={'修改用户'} isVisible={isUpdateVisible} setIsVisible={setIsUpdateVisible} setDataSource={setDataSource} dataSource={dataSource} />
     </div>
   )
 }
+
+
+// UserList (数据源)
+//     │
+//     ├─ dataSource (state)
+//     │     │
+//     │     ├─ 传递给 UserForm (props)
+//     │     │      │
+//     │     │      ├─ 回显 (编辑时从 dataSource 取)
+//     │     │      ├─ 修改 (通过 setDataSource 回传)
+//     │     │
+//     │     ├─ 被 changeRoleState / handleDeleteUser 修改
+//     │     └─ 被 UserForm 的添加/编辑操作修改
+//     │
+//     └─ 模态框控制 (isAddVisible, isUpdateVisible, chooseId)
+//            │
+//            └─ 控制 UserForm 的显示模式

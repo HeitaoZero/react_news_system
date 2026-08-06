@@ -33,7 +33,13 @@ const menuItemIcon = {
   "/publish-manage/sunset": <UploadOutlined />,
 
 }
-
+const GetToken = () => {
+  return JSON.parse(localStorage.getItem('token'))
+}
+const { role: { rights } } = GetToken()
+const checkPagePermission = (item) => {
+  return item.pagepermisson && rights.includes(item.key)
+}
 // 迭代菜单list，过滤掉没有权限的菜单项，并将其转换为antd Menu组件所需的格式
 const transformMenu = ((items) => {
   return items
@@ -44,12 +50,17 @@ const transformMenu = ((items) => {
         label: item.title,
         icon: menuItemIcon[item.key]
       }
-      if (item.children && item.children.length > 0) {
+      console.log(item, checkPagePermission(item))
+      if (!checkPagePermission(item)) {
+        return null
+      }
+      if (checkPagePermission(item) && item.children && item.children.length > 0) {
         result.children = transformMenu(item.children)
       }
       return result
     })
 })
+
 export default function SideMenu() {
   const [collapsed] = useState(false);
   const navigate = useNavigate();
@@ -63,6 +74,7 @@ export default function SideMenu() {
 
   useEffect(() => {
     axios.get('/api/rights?_embed=children').then((res) => {
+      console.log(res.data)
       setMenuList(transformMenu(res.data))
     })
   }, [])

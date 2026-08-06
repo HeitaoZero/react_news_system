@@ -8,9 +8,18 @@ export default function UserForm(props) {
     const [regionList, setRegionList] = useState([]);
     const [roleList, setRoleList] = useState([]);
     const [isRoot, setIsRoot] = useState(false);
+    const GetToken = () => {
+        return JSON.parse(localStorage.getItem('token'))
+    }
+    const { roleId, region } = GetToken()
 
     useEffect(() => {
         const fetchOptions = async () => {
+            const userObj = {
+                "1": "superAdmin",
+                "2": "admin",
+                "3": "audit"
+            }
             try {
                 // 并行请求，提高性能
                 const [regionRes, roleRes] = await Promise.all([
@@ -18,22 +27,72 @@ export default function UserForm(props) {
                     axios.get('/api/roles')
                 ]);
                 // 使用 map 构建新数组，不修改原数据
-                const regionOptions = regionRes.data.map(item => ({
-                    value: item.id,
-                    label: item.title
-                }));
-                const roleOptions = roleRes.data.map(item => ({
-                    value: item.id,
-                    label: item.roleName
-                }));
-                setRegionList(regionOptions);
-                setRoleList(roleOptions);
+                const regionOptions = regionRes.data.map(item => {
+                    if (userObj[roleId] === "superAdmin") {
+                        return {
+                            value: item.id,
+                            label: item.title
+                        }
+                    } else if (userObj[roleId] === "admin") {
+                        if (item.value === region) {
+                            return {
+                                value: item.id,
+                                label: item.title
+                            }
+                        } else {
+                            return {}
+                        }
+                    } else if (userObj[roleId] === "audit") {
+                        if (item.value === region) {
+                            return {
+                                value: item.id,
+                                label: item.title
+                            }
+                        } else {
+                            return {}
+                        }
+                    } else {
+                        return {}
+                    }
+                });
+                const roleOptions = roleRes.data.map(item => {
+                    if (userObj[roleId] === "superAdmin") {
+                        return {
+                            value: item.id,
+                            label: item.roleName
+                        }
+                    } else if (userObj[roleId] === "admin") {
+                        if (userObj[item.id] === "audit" || userObj[item.id] === "admin") {
+                            return {
+                                value: item.id,
+                                label: item.roleName
+                            }
+                        } else {
+                            return {}
+                        }
+                    } else if (userObj[roleId] === "audit") {
+                        if (userObj[item.id] === "audit") {
+                            return {
+                                value: item.id,
+                                label: item.roleName
+                            }
+                        } else {
+                            return {}
+                        }
+                    } else {
+                        return {}
+                    }
+                });
+                const newRegionOptions = regionOptions.filter(item => Object.keys(item).length > 0)
+                const newRoleOptions = roleOptions.filter(item => Object.keys(item).length > 0)
+                setRegionList(newRegionOptions);
+                setRoleList(newRoleOptions);
             } catch (error) {
                 console.log(error);
             }
         };
         fetchOptions()
-    }, [])
+    }, [region, roleId])
 
     useEffect(() => {
         if (isRoot) {
@@ -89,22 +148,20 @@ export default function UserForm(props) {
     const handleUpdate = async (id) => {
         try {
             const userData = props.dataSource.find(data => data.id === id)
-            console.log(userData)
             const values = await form.validateFields()
             console.log(values)
+            console.log(userData.username === values.username && userData.region === values.region && userData.roleName === values.roleName && userData.password === values.password)
             if (userData.username === values.username && userData.region === values.region && userData.roleName === values.roleName && userData.password === values.password) {
                 props.setIsVisible(false)
             } else {
                 props.dataSource.find(data => data.id === id).username = values.username
                 props.dataSource.find(data => data.id === id).region = values.region
-                props.dataSource.find(data => data.id === id).roleId = values.roleName
+                props.dataSource.find(data => data.id === id).roleId = roleList.filter(item => item.label === values.roleName)[0].value
                 props.dataSource.find(data => data.id === id).password = values.password
-                props.dataSource.find(data => data.id === id).roleName = roleList.filter(item => item.value === values.roleName)[0].label
-                console.log(props.dataSource, values.roleName)
+                props.dataSource.find(data => data.id === id).roleName = values.roleName
                 try {
-                    await axios.patch(`/api/users/${id}`, { username: values.username, region: values.region, roleId: values.roleName, password: values.password })
-
-                    props.setDataSource(props.dataSource)
+                    await axios.patch(`/api/users/${id}`, { username: values.username, region: values.region, roleId: roleList.filter(item => item.label === values.roleName)[0].value, password: values.password })
+                    props.setDataSource([...props.dataSource])
                     props.setIsVisible(false)
                 } catch (err) { console.log(err) }
             }
