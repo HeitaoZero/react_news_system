@@ -13,53 +13,7 @@ import {
 import styles from './SideMenu.module.css'
 const { Sider } = Layout
 
-const menuItemIcon = {
-  "/home": <UserOutlined />,
-  "/user-manage": <VideoCameraOutlined />,
-  "/user-manage/list": <UploadOutlined />,
-  "/right-manage": <UploadOutlined />,
-  "/right-manage/role/list": <UploadOutlined />,
-  "/right-manage/right/list": <UploadOutlined />,
-  "/news-manage": <UploadOutlined />,
-  "/news-manage/add": <UploadOutlined />,
-  "/news-manage/draft": <UploadOutlined />,
-  "/news-manage/category": <UploadOutlined />,
-  "/audit-manage": <UploadOutlined />,
-  "/audit-manage/audit": <UploadOutlined />,
-  "/audit-manage/list": <UploadOutlined />,
-  "/publish-manage": <UploadOutlined />,
-  "/publish-manage/unpublished": <UploadOutlined />,
-  "/publish-manage/published": <UploadOutlined />,
-  "/publish-manage/sunset": <UploadOutlined />,
 
-}
-const GetToken = () => {
-  return JSON.parse(localStorage.getItem('token'))
-}
-const { role: { rights } } = GetToken()
-const checkPagePermission = (item) => {
-  return item.pagepermisson && rights.includes(item.key)
-}
-// 迭代菜单list，过滤掉没有权限的菜单项，并将其转换为antd Menu组件所需的格式
-const transformMenu = ((items) => {
-  return items
-    .filter(item => item.pagepermisson === 1)
-    .map(item => {
-      const result = {
-        key: item.key,
-        label: item.title,
-        icon: menuItemIcon[item.key]
-      }
-      console.log(item, checkPagePermission(item))
-      if (!checkPagePermission(item)) {
-        return null
-      }
-      if (checkPagePermission(item) && item.children && item.children.length > 0) {
-        result.children = transformMenu(item.children)
-      }
-      return result
-    })
-})
 
 export default function SideMenu() {
   const [collapsed] = useState(false);
@@ -71,13 +25,59 @@ export default function SideMenu() {
     navigate(key);
   };
 
+  const GetToken = () => {
+    return JSON.parse(localStorage.getItem('token'))
+  }
+  const { role: { rights } } = GetToken()
+
+
 
   useEffect(() => {
+    const menuItemIcon = {
+      "/home": <UserOutlined />,
+      "/user-manage": <VideoCameraOutlined />,
+      "/user-manage/list": <UploadOutlined />,
+      "/right-manage": <UploadOutlined />,
+      "/right-manage/role/list": <UploadOutlined />,
+      "/right-manage/right/list": <UploadOutlined />,
+      "/news-manage": <UploadOutlined />,
+      "/news-manage/add": <UploadOutlined />,
+      "/news-manage/draft": <UploadOutlined />,
+      "/news-manage/category": <UploadOutlined />,
+      "/audit-manage": <UploadOutlined />,
+      "/audit-manage/audit": <UploadOutlined />,
+      "/audit-manage/list": <UploadOutlined />,
+      "/publish-manage": <UploadOutlined />,
+      "/publish-manage/unpublished": <UploadOutlined />,
+      "/publish-manage/published": <UploadOutlined />,
+      "/publish-manage/sunset": <UploadOutlined />,
+    }
+    const checkPagePermission = (item) => {
+      return item.pagepermisson && rights.includes(item.key)
+    }
+    // 迭代菜单list，过滤掉没有权限的菜单项，并将其转换为antd Menu组件所需的格式
+    const transformMenu = ((items) => {
+      return items
+        .filter(item => item.pagepermisson === 1)
+        .map(item => {
+          const result = {
+            key: item.key,
+            label: item.title,
+            icon: menuItemIcon[item.key]
+          }
+          if (!checkPagePermission(item)) {
+            return null
+          }
+          if (checkPagePermission(item) && item.children && item.children.length > 0) {
+            result.children = transformMenu(item.children)
+          }
+          return result
+        })
+    })
     axios.get('/api/rights?_embed=children').then((res) => {
-      console.log(res.data)
       setMenuList(transformMenu(res.data))
     })
-  }, [])
+  }, [rights])
 
   return (
     <Sider trigger={null} collapsible collapsed={collapsed}>

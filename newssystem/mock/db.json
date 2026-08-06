@@ -179,11 +179,11 @@
         "/right-manage/right/update",
         "/right-manage/role/delete",
         "/right-manage",
-        "/right-manage/role/list",
         "/news-manage/update/:id",
         "/news-manage/preview/:id",
         "/news-manage/draft",
-        "/news-manage/category"
+        "/news-manage/category",
+        "/right-manage/role/list"
       ]
     },
     {
