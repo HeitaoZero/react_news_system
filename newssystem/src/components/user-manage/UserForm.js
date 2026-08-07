@@ -8,10 +8,26 @@ export default function UserForm(props) {
     const [regionList, setRegionList] = useState([]);
     const [roleList, setRoleList] = useState([]);
     const [isRoot, setIsRoot] = useState(false);
-    const GetToken = () => {
-        return JSON.parse(localStorage.getItem('token'))
-    }
-    const { roleId, region } = GetToken()
+    const [roleId, setRoleId] = useState(null);
+    const [region, setRegion] = useState(null);
+
+    useEffect(() => {
+        try {
+            const token = JSON.parse(localStorage.getItem('token'));
+            if (token?.roleId) {
+                setRoleId(token.roleId);
+            }
+            if (token?.region) {
+                setRegion(token.region);
+            }
+        } catch (error) {
+            console.warn(error);
+        }
+    }, [])
+    // const GetToken = () => {
+    //     return JSON.parse(localStorage.getItem('token'))
+    // }
+    // const { roleId, region } = GetToken()
 
     useEffect(() => {
         const fetchOptions = async () => {

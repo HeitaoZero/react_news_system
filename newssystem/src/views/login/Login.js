@@ -1,25 +1,26 @@
 import React from 'react';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Form, Input, message } from 'antd';
-import { useNavigate } from 'react-router-dom'
+// import { useNavigate } from 'react-router-dom'
 
 import axios from 'axios'
 // import { useEffect } from 'react'
 import styles from './Login.module.css'
 export default function Login() {
-    const navigate = useNavigate()
+    // const navigate = useNavigate()
     const onFinish = (values) => {
-        console.log('Success:', values);
         axios.get(`/api/users?username=${values.username}&password=${values.password}&_expand=role`).then(res => {
-            console.log(res.data, res.data[0].roleState)
             if (res.data.length === 1 && res.data[0].roleState) {
                 localStorage.setItem('token', JSON.stringify(res.data[0]))
-                console.log(res.data[0])
-                navigate('/home')
-                console.log(res.data[0])
+                // navigate('/home')
+                // setTimeout(() => navigate('/home'), 0);
+                window.location.href = '/home';
+                // navigate(0)
             } else {
                 message.error('用户名密码错误')
             }
+        }).catch(err => {
+            console.log(err)
         })
     };
 

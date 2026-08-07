@@ -10,10 +10,29 @@ export default function UserList() {
   const [isAddVisible, setIsAddVisible] = useState(false);
   const [isUpdateVisible, setIsUpdateVisible] = useState(false);
   const [chooseId, setChooseId] = useState(null);
-  const GetToken = () => {
-    return JSON.parse(localStorage.getItem('token'))
-  }
-  const { roleId, id, region } = GetToken()
+  const [roleId, setRoleId] = useState(null);
+  const [id, setId] = useState(null);
+  const [region, setRegion] = useState(null);
+  useEffect(() => {
+    try {
+      const token = JSON.parse(localStorage.getItem('token'));
+      if (token?.roleId) {
+        setRoleId(token.roleId);
+      }
+      if (token?.id) {
+        setId(token.id);
+      }
+      if (token?.region) {
+        setRegion(token.region);
+      }
+    } catch (error) {
+      console.warn(error);
+    }
+  }, [])
+  // const GetToken = () => {
+  //   return JSON.parse(localStorage.getItem('token'))
+  // }
+  // const { roleId, id, region } = GetToken()
 
   const columns = [
     {

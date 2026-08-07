@@ -25,10 +25,18 @@ export default function SideMenu() {
     navigate(key);
   };
 
-  const GetToken = () => {
-    return JSON.parse(localStorage.getItem('token'))
-  }
-  const { role: { rights } } = GetToken()
+  const [rights, setRights] = useState([]);
+
+  useEffect(() => {
+    try {
+      const token = JSON.parse(localStorage.getItem('token'));
+      if (token?.role?.rights) {
+        setRights(token.role.rights);
+      }
+    } catch (error) {
+      console.warn('读取 token 失败，可能未登录');
+    }
+  }, []);
 
 
 

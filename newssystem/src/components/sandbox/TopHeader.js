@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { MenuFoldOutlined, MenuUnfoldOutlined, DownOutlined, UserOutlined } from '@ant-design/icons';
 import styles from './TopHeaders.module.css'
 import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react';
 
 
 const { Header } = Layout;
@@ -13,10 +14,25 @@ export default function TopHeader() {
     const {
         token: { colorBgContainer },
     } = theme.useToken();
-    const GetToken = () => {
-        return JSON.parse(localStorage.getItem('token'))
-    }
-    const { username, role: { roleName } } = GetToken()
+    const [username, setUsername] = useState()
+    const [roleName, setRoleName] = useState()
+    useEffect(() => {
+        try {
+            const token = JSON.parse(localStorage.getItem('token'));
+            if (token?.role?.roleName) {
+                setRoleName(token.role.roleName);
+            }
+            if (token?.username) {
+                setUsername(token.username);
+            }
+        } catch (error) {
+            console.warn(error);
+        }
+    }, [])
+    // const GetToken = () => {
+    //     return JSON.parse(localStorage.getItem('token'))
+    // }
+    // const { username, role: { roleName } } = GetToken()
     const navigate = useNavigate()
     const items = [
         {

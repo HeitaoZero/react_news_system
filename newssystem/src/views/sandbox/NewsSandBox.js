@@ -1,19 +1,28 @@
 import React from 'react'
 import SideMenu from '../../components/sandbox/SideMenu'
 import TopHeader from '../../components/sandbox/TopHeader'
-import { Routes, Route, Navigate } from 'react-router-dom'
-import Home from './home/Home'
-import UserList from './user-manage/UserList'
-import RoleList from './right-manage/RoleList'
-import RightList from './right-manage/RightList'
-import Nopermission from './nopermission/Nopermission'
+
 import './NewsSandBox.css'
 import { Layout, theme } from 'antd'
+import NewsRouter from '../../components/news-router/NewsRouter'
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
+import { useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 const { Content } = Layout;
 export default function NewsSandBox() {
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
+    const location = useLocation();
+    useEffect(() => {
+        NProgress.start()
+        const timer = setTimeout(() => {
+            NProgress.done();
+        }, 200); // 适当延时，让用户看到进度动画
+
+        return () => clearTimeout(timer); // 清理定时器
+    }, [location])
     return (
         <Layout>
             <SideMenu />
@@ -28,14 +37,8 @@ export default function NewsSandBox() {
                         borderRadius: borderRadiusLG,
                     }}
                 >
-                    <Routes>
-                        <Route path="/home" element={<Home />} />
-                        <Route path="/" element={<Navigate to="/home" />} />
-                        <Route path="/user-manage/list" element={<UserList />} />
-                        <Route path="/right-manage/role/list" element={<RoleList />} />
-                        <Route path="/right-manage/right/list" element={<RightList />} />
-                        <Route path="*" element={<Nopermission />} />
-                    </Routes>
+                    <NewsRouter />
+
                 </Content>
             </Layout>
         </Layout>
