@@ -5,6 +5,7 @@ import NewsEditor from '../../../components/news-manage/NewsEditor'
 import axios from 'axios'
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+const { Option } = Select;
 export default function NewsAdd() {
   const [current, setCurrent] = useState(0)
   const [content, setContent] = useState('')
@@ -32,7 +33,7 @@ export default function NewsAdd() {
   ]
   useEffect(() => {
     axios.get("/api/categories").then(res => {
-      // console.log(res.data)
+      console.log(res.data)
       setCategoryList(res.data)
     })
   }, [])
@@ -120,9 +121,13 @@ export default function NewsAdd() {
               name="categoryId"
               rules={[{ required: true, message: 'Please select your category!' }]}
             >
-              <Select
-                options={categoryList}
-              />
+              <Select>
+                {
+                  categoryList.map(item =>
+                    <Option value={item.id} key={item.id}>{item.title}</Option>
+                  )
+                }
+              </Select>
             </Form.Item>
           </Form>
         </div>
@@ -132,7 +137,7 @@ export default function NewsAdd() {
             setContent(value)
           }}></NewsEditor>
         </div>
-        <div className={current === 2 ? "" : styles.active}>3333333333</div>
+        <div className={current === 2 ? "" : styles.active}></div>
       </div>
       <div className={styles.button}>
         {

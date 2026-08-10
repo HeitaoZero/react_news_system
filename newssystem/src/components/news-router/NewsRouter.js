@@ -8,6 +8,8 @@ import RightList from '../../views/sandbox/right-manage/RightList'
 import Nopermission from '../../views/sandbox/nopermission/Nopermission'
 import NewsAdd from '../../views/sandbox/news-manage/NewsAdd'
 import NewsDraft from '../../views/sandbox/news-manage/NewsDraft'
+import NewsPreview from '../../views/sandbox/news-manage/NewsPreview'
+import NewsUpdate from '../../views/sandbox/news-manage/NewsUpdate'
 import NewsCategory from '../../views/sandbox/news-manage/NewsCategory'
 import Audit from '../../views/sandbox/audit-manage/Audit'
 import AuditList from '../../views/sandbox/audit-manage/AuditList'
@@ -23,6 +25,8 @@ const LocalRouterMap = {
     "/right-manage/right/list": < RightList />,
     "/news-manage/add": <NewsAdd />,
     "/news-manage/draft": <NewsDraft />,
+    "/news-manage/preview/:id": <NewsPreview />,
+    "/news-manage/update/:id": <NewsUpdate />,
     "/news-manage/category": <NewsCategory />,
     "/audit-manage/audit": <Audit />,
     "/audit-manage/list": < AuditList />,
@@ -46,16 +50,15 @@ export default function NewsRouter() {
     // const { role: { rights } } = JSON.parse(localStorage.getItem('token'))
     useEffect(() => {
         Promise.all([
-            axios.get('http://localhost:5000/rights'),
-            axios.get('http://localhost:5000/children'),
+            axios.get('/api/rights'),
+            axios.get('/api/children'),
         ]).then(res => {
             setBackRouterList([...res[0].data, ...res[1].data])
-
         })
     }, [])
 
     const checkRoute = (item) => {
-        return LocalRouterMap[item.key] && item.pagepermisson
+        return LocalRouterMap[item.key] && (item.pagepermisson || item.routepermisson)
     }
     const checkUserPermission = (item) => {
         return rights.includes(item.key)
