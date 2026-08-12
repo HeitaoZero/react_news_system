@@ -60,7 +60,6 @@ export default function NewsDraft() {
     },
   ];
   const handleDeleteNewsDraft = (item) => {
-    console.log(item.id)
     try {
       axios.delete(`/api/news/${item.id}`).then(res => {
         const list = dataSource.filter(data => data.id !== item.id)
@@ -71,13 +70,13 @@ export default function NewsDraft() {
     }
   }
   const handleCheck = (id) => {
-    axios.patch(`/news/${id}`, {
+    axios.patch(`/api/news/${id}`, {
       auditState: 1
     }).then(res => {
       navigate('/audit-manage/list')
 
       notification.info({
-        message: `通知`,
+        title: `通知`,
         description:
           `您可以到'审核列表'中查看您的新闻`,
         placement: "bottomRight"
