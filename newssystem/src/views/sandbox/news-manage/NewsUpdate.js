@@ -12,7 +12,6 @@ export default function NewsAdd() {
     const [formInfo, setFormInfo] = useState({})
     const navigate = useNavigate()
     const params = useParams()
-    const [user, setUser] = useState()
     const [categoryList, setCategoryList] = useState([])
     const NewsForm = useRef(null)
 
@@ -39,13 +38,7 @@ export default function NewsAdd() {
             setCategoryList(res.data)
         })
     }, [])
-    useEffect(() => {
-        try {
-            setUser(JSON.parse(localStorage.getItem('token')));
-        } catch (error) {
-            console.log(error)
-        }
-    }, [])
+
     const handleSave = (auditState) => {
         axios.patch(`/api/news/${params.id}`, {
             ...formInfo,

@@ -5,18 +5,23 @@ import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import axios from 'axios'
 import { useLocation } from 'react-router-dom'
+import { connect } from 'react-redux'
 import {
   UploadOutlined,
   UserOutlined,
-  VideoCameraOutlined,
+  HomeOutlined,
+  UnorderedListOutlined,
+  TeamOutlined,
+  HighlightFilled,
+  EditFilled,
+  AuditOutlined
 } from '@ant-design/icons';
 import styles from './SideMenu.module.css'
 const { Sider } = Layout
 
 
 
-export default function SideMenu() {
-  const [collapsed] = useState(false);
+function SideMenu(props) {
   const navigate = useNavigate();
   const location = useLocation()
   const [menuList, setMenuList] = useState([])
@@ -42,19 +47,19 @@ export default function SideMenu() {
 
   useEffect(() => {
     const menuItemIcon = {
-      "/home": <UserOutlined />,
-      "/user-manage": <VideoCameraOutlined />,
-      "/user-manage/list": <UploadOutlined />,
-      "/right-manage": <UploadOutlined />,
-      "/right-manage/role/list": <UploadOutlined />,
-      "/right-manage/right/list": <UploadOutlined />,
-      "/news-manage": <UploadOutlined />,
-      "/news-manage/add": <UploadOutlined />,
-      "/news-manage/draft": <UploadOutlined />,
-      "/news-manage/category": <UploadOutlined />,
-      "/audit-manage": <UploadOutlined />,
-      "/audit-manage/audit": <UploadOutlined />,
-      "/audit-manage/list": <UploadOutlined />,
+      "/home": <HomeOutlined />,
+      "/user-manage": <UserOutlined />,
+      "/user-manage/list": <UnorderedListOutlined />,
+      "/right-manage": <TeamOutlined />,
+      "/right-manage/role/list": <UnorderedListOutlined />,
+      "/right-manage/right/list": <UnorderedListOutlined />,
+      "/news-manage": <HighlightFilled />,
+      "/news-manage/add": <EditFilled />,
+      "/news-manage/draft": <EditFilled />,
+      "/news-manage/category": <EditFilled />,
+      "/audit-manage": <AuditOutlined />,
+      "/audit-manage/audit": <AuditOutlined />,
+      "/audit-manage/list": <UnorderedListOutlined />,
       "/publish-manage": <UploadOutlined />,
       "/publish-manage/unpublished": <UploadOutlined />,
       "/publish-manage/published": <UploadOutlined />,
@@ -88,10 +93,10 @@ export default function SideMenu() {
   }, [rights])
 
   return (
-    <Sider trigger={null} collapsible collapsed={collapsed}>
-      <div className={`demo-logo-vertical ${styles.logo}`} >
+    <Sider trigger={null} collapsible collapsed={props.isCollapsed}>
+      {props.isCollapsed ? null : <div className={`demo-logo-vertical ${styles.logo}`} >
         全球新闻管理系统
-      </div>
+      </div>}
       <div className={styles.menuContainer}>
         <Menu
           theme="dark"
@@ -105,3 +110,9 @@ export default function SideMenu() {
     </Sider >
   )
 }
+const mapStateToProps = ({ CollapsedReducer: { isCollapsed } }) => {
+  return {
+    isCollapsed
+  }
+}
+export default connect(mapStateToProps)(SideMenu)

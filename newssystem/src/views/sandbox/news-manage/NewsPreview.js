@@ -4,16 +4,7 @@ import { LeftOutlined } from '@ant-design/icons'
 import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import moment from 'moment'
-function Title() {
-  const navigate = useNavigate()
-  return (
-    <>
-      <Button size={"large"} color="default" type='text' icon={<LeftOutlined />} onClick={() => { navigate(-1) }}></Button >
-      <span style={{ fontSize: "20px", fontWeight: "bolder", margin: "0 10px" }}>震惊😱</span>
-      <span style={{ fontSize: "14px", margin: "0 10px", color: "gray" }}>科学技术</span>
-    </>
-  )
-}
+
 export default function NewsPreview() {
   const [newsInfo, setNewsInfo] = useState({})
   const params = useParams()
@@ -70,13 +61,26 @@ export default function NewsPreview() {
   ];
   useEffect(() => {
     try {
-      axios.get(`/api/news/${params.id}`).then(res => {
+      axios.get(`/api/news/${params.id}?_expand=category`).then(res => {
         setNewsInfo(res.data)
       })
     } catch (e) {
       console.log(e)
     }
   }, [params.id])
+  function Title() {
+    const navigate = useNavigate()
+    return (
+      <>
+        {
+          newsInfo ? (<><Button size={"large"} color="default" type='text' icon={<LeftOutlined />} onClick={() => { navigate(-1) }}></Button >
+            <span style={{ fontSize: "20px", fontWeight: "bolder", margin: "0 10px" }}>{newsInfo.title}</span>
+            <span style={{ fontSize: "14px", margin: "0 10px", color: "gray" }}>{newsInfo.category?.title}</span>
+          </>) : null
+        }
+      </>
+    )
+  }
   return (
     <>
       <Descriptions title={<Title />} items={items} />

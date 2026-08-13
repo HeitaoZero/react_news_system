@@ -13,7 +13,6 @@ export default function NewsEditor(props) {
         // console.log(props.content)
         // html-===> draft, 
         const html = props.content
-        console.log(html)
         if (html === undefined) return
         const contentBlock = htmlToDraft(html);
         if (contentBlock) {

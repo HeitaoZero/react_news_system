@@ -4,13 +4,13 @@ import { useState } from 'react';
 import { MenuFoldOutlined, MenuUnfoldOutlined, DownOutlined, UserOutlined } from '@ant-design/icons';
 import styles from './TopHeaders.module.css'
 import { useNavigate } from 'react-router-dom'
+import { connect } from 'react-redux'
 import { useEffect } from 'react';
 
 
 const { Header } = Layout;
 
-export default function TopHeader() {
-    const [collapsed, setCollapsed] = useState(true);
+function TopHeader(props) {
     const {
         token: { colorBgContainer },
     } = theme.useToken();
@@ -51,13 +51,12 @@ export default function TopHeader() {
             }
         },
     ];
-
     return (
         <Header style={{ padding: 0, background: colorBgContainer }}>
             <Button
                 type="text"
-                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                onClick={() => setCollapsed(!collapsed)}
+                icon={props.isCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                onClick={() => { props.changeCollapsed() }}
                 style={{
                     fontSize: '16px',
                     width: 64,
@@ -76,3 +75,17 @@ export default function TopHeader() {
         </Header >
     )
 }
+
+const mapStateToProps = ({ CollapsedReducer: { isCollapsed } }) => {
+    return {
+        isCollapsed
+    }
+}
+const mapDispatchToProps = {
+    changeCollapsed() {
+        return {
+            type: "change_collapsed"
+        }
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(TopHeader)

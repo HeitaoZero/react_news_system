@@ -17,6 +17,8 @@ import Unpublished from '../../views/sandbox/publish-manage/Unpublished'
 import Published from '../../views/sandbox/publish-manage/Published'
 import Sunset from '../../views/sandbox/publish-manage/Sunset'
 import axios from 'axios'
+import { Spin } from "antd"
+import { connect } from 'react-redux'
 
 const LocalRouterMap = {
     "/home": <Home />,
@@ -34,7 +36,7 @@ const LocalRouterMap = {
     "/publish-manage/published": <Published />,
     "/publish-manage/sunset": <Sunset />
 }
-export default function NewsRouter() {
+function NewsRouter(props) {
     const [BackRouteList, setBackRouterList] = useState([])
     const [rights, setRights] = useState([])
 
@@ -64,20 +66,25 @@ export default function NewsRouter() {
         return rights.includes(item.key)
     }
     return (
-        <Routes>
-            {
-                BackRouteList.map(item => {
-                    if (checkRoute(item) && checkUserPermission(item))
-                        return <Route path={item.key} element={LocalRouterMap[item.key]} key={item.key} />
-                    else
-                        return null
-                })
-            }
-            <Route path="/" element={<Navigate to="/home" />} />
-            {
-                BackRouteList.length > 0 && <Route path="*" element={<Nopermission />} />
-            }
+        <Spin spinning={props.isLoading}>
+            <Routes>
+                {
+                    BackRouteList.map(item => {
+                        if (checkRoute(item) && checkUserPermission(item))
+                            return <Route path={item.key} element={LocalRouterMap[item.key]} key={item.key} />
+                        else
+                            return null
+                    })
+                }
+                <Route path="/" element={<Navigate to="/home" />} />
+                {
+                    BackRouteList.length > 0 && <Route path="*" element={<Nopermission />} />
+                }
 
-        </Routes>
+            </Routes>
+        </Spin>
     )
 }
+
+const mapStateToProps = ({ LoadingReducer: { isLoading } }) => ({ isLoading })
+export default connect(mapStateToProps)(NewsRouter)

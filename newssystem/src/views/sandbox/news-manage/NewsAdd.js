@@ -33,7 +33,6 @@ export default function NewsAdd() {
   ]
   useEffect(() => {
     axios.get("/api/categories").then(res => {
-      console.log(res.data)
       setCategoryList(res.data)
     })
   }, [])
