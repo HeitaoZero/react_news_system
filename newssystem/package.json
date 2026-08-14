@@ -29,6 +29,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "mock": "json-server --watch mock/db.json --port 5000",
+    "dev": "concurrently \"npm start\" \"npm run mock\"",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -52,6 +54,7 @@
     ]
   },
   "devDependencies": {
+    "concurrently": "^10.0.4",
     "json-server": "^0.17.4"
   }
 }
