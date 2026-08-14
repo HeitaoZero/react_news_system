@@ -83,7 +83,7 @@ export default function NewsPreview() {
   }
   return (
     <>
-      <Descriptions title={<Title />} items={items} />
+      <Descriptions title={<Title />} items={items} column={3} />
       <div dangerouslySetInnerHTML={{
         __html: newsInfo.content
       }} style={{
